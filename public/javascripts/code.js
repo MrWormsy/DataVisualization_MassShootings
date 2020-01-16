@@ -28,10 +28,12 @@ let colorsMentalIllness = {male : "#00adb5", female : '#ff2e63', both : '#fce38a
 let numberOfMassShooting = 0;
 let maxNumberMassShootingPerState= 0;
 let dataset = {};
+let fips;
 
 let bigData;
 
 d3.json('data/fipsToState.json').then(function (data) {
+    fips = data;
     return data;
 }).then(function (fips) {
 
@@ -70,6 +72,28 @@ d3.json('data/fipsToState.json').then(function (data) {
 });
 
 // SVGs
+
+var svgTitle = d3.select('.viz').append('svg')
+    .attr('class', 'center-container')
+    .attr('height', 50)
+    .attr('width', (width + width * 0.8) + 2 * margin.left + 2 * margin.right)
+    .attr('x', 0)
+    .attr('y', 0);
+
+svgTitle.append('g')
+    .append('text')
+    .text('Mass Shootings repartition in the US')
+    .style('font-size', '35px')
+    .attr('x', function () {
+
+        return (width + width * 0.8) / 2 - d3.select(this).node().getBBox().width / 2;
+
+    })
+    .attr('y', function () {
+
+        return 50 - d3.select(this).node().getBBox().height / 2;
+
+    });
 
 var svgMap = d3.select('.viz').append('svg')
     .attr('class', 'center-container')
@@ -136,7 +160,7 @@ function ready(us) {
     // Legend plot
     g.append("text")
         .attr('y', function (d) {
-            return g.node().getBBox().height + 40;
+            return g.node().getBBox().height + 50;
         })
         .style('font-style', 'italic')
         .text(function (d) {
@@ -207,14 +231,20 @@ function ready(us) {
         .text("Proportion of mass shootings");
 
     drawPieCharts(getStateDataForPie(0));
+
+    setViewLabel(0);
 }
 
 function mouseOver(d) {
     drawPieCharts(getStateDataForPie(d.id));
+
+    setViewLabel(d.id);
 }
 
 function mouseOut(d) {
     drawPieCharts(getStateDataForPie(0));
+
+    setViewLabel(0);
 }
 
 function clicked(d) {
@@ -228,6 +258,8 @@ function clicked(d) {
     currentId = d.id;
 
     drawPieCharts(getStateDataForPie(d.id));
+
+    setViewLabel(d.id);
 
     active.classed("active", false);
     active = d3.select(this).classed("active", true);
@@ -392,6 +424,39 @@ function drawPieCharts(data) {
             count++;
         }
     }
+}
+
+function setViewLabel(id) {
+
+    // Know which state we are focusing on
+    svgGender.append("g")
+        .append("text")
+        .attr('id', 'stateText')
+        .text(function () {
+
+            if (id == 0) {
+                return 'Global view';
+            } else {
+                if (id < 10) {
+                    return getKeyByValue(fips, "0" + id) + '\'s view';
+                }
+                return getKeyByValue(fips, "" + id) + '\'s view';
+            }
+
+        })
+        .style('font-size', '32px')
+        .attr('y', function () {
+            //return (d3.select(this).node().getBBox().height);
+            return svgGender.node().getBBox().height + d3.select(this).node().getBBox().height;
+        })
+        .attr('x', function () {
+            return svgGender.node().getBBox().width / 2 - d3.select(this).node().getBBox().width / 2;
+        });
+
+}
+
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
 }
 
 function getStateDataForPie(stateID) {
