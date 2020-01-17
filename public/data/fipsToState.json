@@ -49,5 +49,7 @@
   "Washington"             :  "53",
   "West Virginia"          :  "54",
   "Wisconsin"              :  "55",
-  "Wyoming"                :  "56"
+  "Wyoming"                :  "56",
+  "Puerto Rico"            :  "72",
+  "Virgin Islands"         :  "78"
 }
