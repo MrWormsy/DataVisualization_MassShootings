@@ -9,6 +9,7 @@ let height = width * mapRatio;
 let active = d3.select(null);
 
 let currentId = 0;
+let isClicked = false;
 
 let scaleProportionShootingsPerState;
 let scaleColor = d3.scaleLinear()
@@ -30,11 +31,24 @@ let maxNumberMassShootingPerState= 0;
 let dataset = {};
 let fips;
 
+let capitals = {};
+
+let tableFirstId = 0;
+
 let bigData;
 
 d3.json('data/fipsToState.json').then(function (data) {
     fips = data;
+
+    d3.json('data/capital.json').then(function (capitalData) {
+        capitalData.states.forEach(function (d) {
+            capitals[Number(fips[d.name])] = [d.long, d.lat];
+        });
+    });
+
     return data;
+
+
 }).then(function (fips) {
 
     d3.json("data/mass-shootings-in-america.json").then(function (data) {
@@ -114,6 +128,22 @@ var svgGender = d3.select('.viz').append('svg')
     .attr('width', width * 0.7 + margin.left + margin.right)
     .attr('transform', 'translate(5,0)');
 
+var svgHisto = d3.select('.viz').append('svg')
+    .attr('class', 'center-container')
+    .attr('height', height * 0.7 + margin.top + margin.bottom)
+    .attr('width', width * 0.7 + margin.left + margin.right)
+
+var svgTable = d3.select('.viz').append('svg')
+    .attr('overflow', 'auto')
+    .attr('class', 'center-container')
+    .attr('height', height * 0.7 + margin.top + margin.bottom)
+    .attr('width', width * 1.1 + margin.left + margin.right)
+    .append('g')
+    .append("foreignObject")
+    .attr('height', height * 0.7 + margin.top + margin.bottom)
+    .attr('width', width * 1.1 + margin.left + margin.right)
+    .append("xhtml:body");
+
 var projection = d3.geoAlbersUsa()
     .translate([width /2 , height / 2])
     .scale(width);
@@ -137,7 +167,10 @@ function ready(us) {
         .on("click", reset)
         .on('mouseover', function (d) {
 
+            tableFirstId = 0;
             drawPieCharts(getStateDataForPie(currentId));
+            setViewLabel(currentId);
+            showTable(currentId);
 
         });
 
@@ -169,8 +202,6 @@ function ready(us) {
             return 0;
         });
 
-
-
     // We plot the points representing the density of the mass shootings per states
     for (let id in dataset) {
         g.append("g").append("circle")
@@ -183,11 +214,17 @@ function ready(us) {
             })
             .attr("class", "statesPoints")
             .attr("cx", function (d) {
-                return projection(dataset[id][0].geometry.coordinates)[0];
+                return projection(capitals[Number(id)])[0];
+                //return projection(dataset[id][0].geometry.coordinates)[0];
             })
             .attr("cy", function (d) {
-                return projection(dataset[id][0].geometry.coordinates)[1]
-            });
+                return projection(capitals[Number(id)])[1];
+                //return projection(dataset[id][0].geometry.coordinates)[1]
+            })
+            .on('mouseover', function () {
+                mouseOver({id : Number(id)});
+            })
+            .on('mouseout', reset());
     }
 
 
@@ -230,21 +267,24 @@ function ready(us) {
         })
         .text("Proportion of mass shootings");
 
+    tableFirstId = 0;
     drawPieCharts(getStateDataForPie(0));
-
     setViewLabel(0);
+    showTable(0);
 }
 
 function mouseOver(d) {
+    tableFirstId = 0;
     drawPieCharts(getStateDataForPie(d.id));
-
     setViewLabel(d.id);
+    showTable(d.id);
 }
 
 function mouseOut(d) {
+    tableFirstId = 0;
     drawPieCharts(getStateDataForPie(0));
-
     setViewLabel(0);
+    showTable(0);
 }
 
 function clicked(d) {
@@ -257,9 +297,10 @@ function clicked(d) {
 
     currentId = d.id;
 
+    tableFirstId = 0;
     drawPieCharts(getStateDataForPie(d.id));
-
     setViewLabel(d.id);
+    showTable(d.id);
 
     active.classed("active", false);
     active = d3.select(this).classed("active", true);
@@ -348,6 +389,11 @@ function drawPieCharts(data) {
 
     svgGender.selectAll("*").remove();
 
+    let max = 0;
+    for(let key in data[0].data) {
+        max += data[0].data[key].value;
+    }
+
     for (let i = 0; i < 2; i++) {
 
         for (let j = 0; j < 2; j++) {
@@ -367,8 +413,7 @@ function drawPieCharts(data) {
                 .on('mouseover', function (d) {
                     d3.select(this.parentNode).append('text')
                         .text(function () {
-                            //return (Math.round((d.value / data[count].data.length) * 100) / 100).toFixed(0) + "%";
-                            return d.value;
+                            return (Math.round((d.value / max) * 100)).toFixed(2) + "%";
                         })
                         .attr('id', 'tempText')
                         .attr('x', function () {
@@ -457,6 +502,234 @@ function setViewLabel(id) {
 
 function getKeyByValue(object, value) {
     return Object.keys(object).find(key => object[key] === value);
+}
+
+// Titles
+
+// Table here
+
+// Number of shooting
+// Number of victims
+// Age
+// Date
+// City
+// Fate of shooter
+
+// Show Table
+function showTable(stateID) {
+
+    let theData;
+
+    if (stateID == 0) {
+        theData = bigData;
+    } else {
+        theData = dataset[stateID];
+    }
+
+    // If there is no shooting we return
+    if (theData.length == 0) {
+        return;
+    }
+
+    /*
+
+    let dataToDisplay = [];
+
+    let date;
+    let age;
+    let city;
+    let fate;
+    let victims;
+
+    theData.forEach(function (d) {
+
+        date = "Unknown";
+        age = "Unknown";
+        city = "Unknown";
+        fate = "Unknown";
+        victims = "Unknown";
+
+        if (d.fields.date) {
+            date = d.fields.date;
+        }
+
+        if (d.fields.average_shooter_age) {
+            age = d.fields.average_shooter_age;
+        }
+
+        if (d.fields.city) {
+            city = d.fields.city;
+        }
+
+        if (d.fields.fate_of_shooter_at_the_scene) {
+            fate = d.fields.fate_of_shooter_at_the_scene;
+        }
+
+        if (d.fields.number_of_victims_injured) {
+            victims = d.fields.number_of_victims_injured;
+        }
+
+        dataToDisplay.push([date, age, city, fate, victims]);
+    });
+
+     */
+
+    svgTable.selectAll('table').remove();
+
+    let table = svgTable
+            .append("table")
+            .attr("class", "table table-condensed table-striped");
+
+    let thead = table.append("thead");
+    thead.html('<th>Date</th><th>City</th><th>Age of shooter</th><th>Number of victims</th><th>Fate of Shooter</th>');
+
+    let tbody = table.append("tbody")
+        .on("wheel.zoom", function () {
+
+            var direction = d3.event.wheelDelta < 0 ? 'down' : 'up';
+            console.log(direction);
+
+            if (direction === 'up') {
+                tableFirstId--;
+            } else {
+                tableFirstId++;
+            }
+
+            showTable(currentId);
+
+            //console.log("eaez");
+
+
+        });
+
+    /*
+
+    var header = thead.append("tr")
+        .selectAll("th")
+        .data(columns)
+        .enter()
+        .append("th")
+        .text(function(d){ return d;})
+
+    */
+
+    /*
+
+    dataToDisplay.forEach(function (d) {
+
+        tbody.append('tr')
+            .html(function () {
+
+                return '<td>5<td>';
+
+            })
+    });
+
+     */
+
+    /*
+
+    var cells = rows.selectAll("td")
+        .data(function(row){
+            console.log(row);
+        })
+        .enter()
+        .append("td")
+        .html(function(d){ return d.value;});
+
+     */
+
+    let date;
+    let age;
+    let city;
+    let fate;
+    let victims;
+
+    if (tableFirstId >= theData.length) {
+        tableFirstId --;
+    }
+
+    if (tableFirstId < 0) {
+        tableFirstId = 0;
+    }
+
+    theData.slice(tableFirstId, tableFirstId + 9).forEach(function (d) {
+
+        date = "Unknown";
+        age = "-";
+        city = "Unknown";
+        fate = "Unknown";
+        victims = "-";
+
+        if (d.fields.date) {
+            date = d.fields.date;
+        }
+
+        if (d.fields.average_shooter_age) {
+            age = d.fields.average_shooter_age;
+        }
+
+        if (d.fields.city) {
+            city = d.fields.city;
+        }
+
+        if (d.fields.fate_of_shooter_at_the_scene) {
+            fate = d.fields.fate_of_shooter_at_the_scene;
+        }
+
+        if (d.fields.number_of_victims_injured) {
+            victims = d.fields.number_of_victims_injured;
+        }
+
+        tbody.append('tr')
+            .html(function () {
+
+                return '<td>' + date + '</td>' + '<td>' + city + '</td>' + '<td>' + age + '</td>' + '<td>' + victims + '</td>' + '<td>' + fate + '</td>';
+
+            })
+
+    });
+
+    /*
+
+    theData.forEach(function (d) {
+
+        date = "Unknown";
+        age = "-";
+        city = "Unknown";
+        fate = "Unknown";
+        victims = "-";
+
+        if (d.fields.date) {
+            date = d.fields.date;
+        }
+
+        if (d.fields.average_shooter_age) {
+            age = d.fields.average_shooter_age;
+        }
+
+        if (d.fields.city) {
+            city = d.fields.city;
+        }
+
+        if (d.fields.fate_of_shooter_at_the_scene) {
+            fate = d.fields.fate_of_shooter_at_the_scene;
+        }
+
+        if (d.fields.number_of_victims_injured) {
+            victims = d.fields.number_of_victims_injured;
+        }
+
+        tbody.append('tr')
+            .html(function () {
+
+                return '<td>' + date + '</td>' + '<td>' + city + '</td>' + '<td>' + age + '</td>' + '<td>' + victims + '</td>' + '<td>' + fate + '</td>';
+
+            })
+
+    });
+
+     */
 }
 
 function getStateDataForPie(stateID) {
