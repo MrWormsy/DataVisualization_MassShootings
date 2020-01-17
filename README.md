@@ -6,7 +6,7 @@ Made with d3 js on a nodejs server (express).
 
 The live link http://51.178.46.76:3000/
 
-## how to use it
+## How to use it
 
 ### Prerequisite :
 1. Download and install NodeJS https://nodejs.org/en/.
@@ -19,6 +19,6 @@ npm install
 ```
 3. Run the following commands to launch the server.
 ```sh
-nodemon app.js
+node app.js
 ```
-4. Go to localhost:3000
+4. Go to localhost:3000 and enjoy the visualization
