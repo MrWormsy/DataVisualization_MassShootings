@@ -17,10 +17,8 @@ let scaleColor = d3.scaleLinear()
     .range(['#5c7658', '#e6d385', '#d25959']);
 
 // Male, Female, Male/Female, Unknown
-let colorsSex = {Male : "#00adb5", Female : '#ff2e63', Unknown : "#8785a2"};
-let colorsRace = {White : "#00adb5", Black : '#ff2e63', both : '#fce38a', unknown : "#8785a2"};
-let colorsGuns = {male : "#00adb5", female : '#ff2e63', both : '#fce38a', unknown : "#8785a2"};
-let colorsMentalIllness = {male : "#00adb5", female : '#ff2e63', both : '#fce38a', unknown : "#8785a2"};
+let colorsSex = {"Male" : "#00adb5", "Female" : '#ff2e63', "Unknown" : "#8785a2"};
+let colorsRace = {"White" : "#00adb5", "Black" : '#ff2e63', "Asian" : '#fce38a', "Native" : "#8785a2", "Other" : "#758184"};
 
 // Now we need to gather all the data and we set it them in a dataset with the id os the state as the key
 
@@ -126,11 +124,11 @@ var svgGender = d3.select('.viz').append('svg')
     .attr('class', 'center-container')
     .attr('height', height + margin.top + margin.bottom)
     .attr('width', width * 0.6 + margin.left + margin.right)
-    .attr('transform', 'translate(5,0)');
+    //.attr('transform', 'translate(5,0)');
 
 var svgHisto = d3.select('.viz').append('svg')
     .attr('class', 'center-container')
-    .attr('height', height * 0.6 + 3 * margin.top + 4 * margin.bottom)
+    .attr('height', height * 0.6 + 4 * margin.top + 4 * margin.bottom)
     .attr('width', width * 0.7 + margin.left + margin.right);
 
 var svgTable = d3.select('.viz').append('svg')
@@ -413,7 +411,20 @@ function drawPieCharts(data) {
             path = g.datum(data[count].data).selectAll("path")
                 .data(pie)
                 .enter().append("path")
-                .attr("fill", function(d, i) { return color(i); })
+                .attr("fill", function(d, i) {
+
+                    // Race
+                    if (count === 2) {
+                        return colorsRace[d.data.title];
+                    }
+
+                    // Sex
+                    else if (count === 3) {
+                        return colorsSex[d.data.title];
+                    }
+                    
+                    return color(i);
+                })
                 .attr("d", arc)
                 .on('mouseover', function (d) {
                     d3.select(this.parentNode).append('text')
@@ -444,6 +455,16 @@ function drawPieCharts(data) {
                     return (radius * 0.5) + (d.id * -25);
                 })
                 .attr('fill', function (d) {
+                    // Race
+                    if (count === 2) {
+                        return colorsRace[d.title];
+                    }
+
+                    // Sex
+                    else if (count === 3) {
+                        return colorsSex[d.title];
+                    }
+
                     return color(d.id);
                 });
 
@@ -678,7 +699,7 @@ function showBarChart(stateId) {
     var highlightColor = d3.interpolateInferno(0.3);
 
     let gHisto = svgHisto.append("g")
-        .attr("transform", "translate(" + (2.5 * margin.left) + "," + ( 2 * margin.top) + ")");
+        .attr("transform", "translate(" + (2.5 * margin.left) + "," + ( 3 * margin.top) + ")");
 
     var x = d3.scaleBand()
         .range([0, width * 0.7])
@@ -718,6 +739,21 @@ function showBarChart(stateId) {
         .attr("height", 0)
         .attr("y",  d => { return y(d.value); })
         .attr("height",  d => { return 0.6 * height - y(d.value); });
+
+    // Labels
+    gHisto.selectAll(".label")
+        .data(dataToDisplay)
+        .enter()
+        .append("text")
+        .attr("class", "label")
+        .style("display",  d => { return d.value === null ? "none" : null; })
+        .style('opacity', 0.9)
+        .attr("x", ( d => { return x(d.year) + (x.bandwidth() / 2) -8 ; }))
+        .attr("y",  d => { return height * 0.7; })
+        .attr("height", 0)
+        .text( d => { return d.value; })
+        .attr("y",  d => { return y(d.value) + .1; })
+        .attr("dy", "-.7em");
 
     // Legend plot
     svgHisto.append('g').append("text")
