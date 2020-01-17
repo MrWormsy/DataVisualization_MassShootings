@@ -97,7 +97,7 @@ d3.json('data/fipsToState.json').then(function (data) {
 
 // SVGs
 
-var svgTitle = d3.select('.viz').append('svg')
+let svgTitle = d3.select('.viz').append('svg')
     .attr('class', 'center-container')
     .attr('height', 50)
     .attr('width', (width + width * 0.8) + 2 * margin.left + 2 * margin.right)
@@ -115,7 +115,7 @@ svgTitle.append('g')
         return 50 - d3.select(this).node().getBBox().height / 2;
     });
 
-var svgMap = d3.select('.viz').append('svg')
+let svgMap = d3.select('.viz').append('svg')
     .attr('class', 'center-container')
     .attr('height', height + margin.top + margin.bottom)
     .attr('width', width + margin.left + margin.right)
@@ -128,13 +128,13 @@ svgMap.append('rect')
     .attr('width', width + margin.left + margin.right)
     .on('click', clicked);
 
-var svgGender = d3.select('.viz').append('svg')
+let svgGender = d3.select('.viz').append('svg')
     .attr('class', 'center-container')
     .attr('height', height + margin.top + margin.bottom)
     .attr('width', width * 0.6 + margin.left + margin.right)
     //.attr('transform', 'translate(5,0)');
 
-var svgSkull = d3.select('.viz').append('svg')
+let svgSkull = d3.select('.viz').append('svg')
     .attr('class', 'center-container')
     .attr('height', height + margin.top + margin.bottom)
     .attr('width', width * 0.2);
@@ -147,12 +147,12 @@ svgSkull.append('g')
     .attr('id', 'skull')
     .attr('d', "M4548.9,4997c-1351.6-189.5-2337.7-875.5-2662.7-1850.3c-160.2-489.7-133.1-1130.5,79-1839.1c144.4-478.4,148.9-507.7,153.4-801.1c2.3-155.7-4.5-318.2-13.5-363.3C2091.6,71,2078,59.7,1983.3,30.4c-133.1-40.6-191.8-117.3-205.3-275.3c-18.1-234.7,121.9-609.3,327.2-859.7c135.4-167,232.4-216.6,471.6-248.2c137.6-15.8,191.8-31.6,198.6-56.4c31.6-103.8,171.5-877.8,194.1-1062.8c15.8-126.4,18-311.4,9-453.6c-11.3-191.8-6.8-264,24.8-370.1c137.7-473.9,559.6-952.2,1186.9-1347.1c112.8-72.2,241.4-135.4,282.1-144.4c49.6-9,153.4,4.5,279.8,33.8c246,58.7,234.7,58.7,494.2-2.3c261.7-58.7,300.1-51.9,577.7,121.9C6406-4270.5,6868.6-3747,6990.5-3311.5c33.8,126.4,38.4,196.3,27.1,422c-13.5,295.6,22.6,607,144.4,1207.2l63.2,304.6l189.6,24.8c106.1,13.5,234.7,47.4,286.6,72.2c173.8,90.3,408.4,464.9,491.9,783c40.6,162.5,40.6,243.7,0,361c-36.1,99.3-90.3,146.7-212.1,180.5c-79,22.6-81.2,29.3-99.3,158c-11.3,74.5-13.5,250.5-6.8,390.4c11.3,203.1,29.3,302.4,90.3,496.4c437.8,1362.9,300.1,2258.8-460.3,2992.1c-435.5,419.7-1026.7,713.1-1737.5,859.7c-223.4,47.4-363.3,60.9-676.9,67.7C4873.8,5012.8,4630.1,5008.3,4548.9,4997z M3973.5,1111.3c322.7-169.2,453.6-543.8,297.9-857.5c-155.7-315.9-521.3-482.9-1112.5-507.7c-273-11.3-306.9-9-397.1,33.8C2642.2-161.4,2597-89.2,2563.2,98.1c-29.3,169.2-13.5,383.6,47.4,582.2c56.4,185,198.6,315.9,431,399.4c234.7,85.8,338.5,101.5,593.5,94.8C3826.8,1169.9,3876.5,1160.9,3973.5,1111.3z M6719.7,1149.6c194-40.6,431-146.7,521.2-232.4c133.1-126.4,196.3-325,196.3-625.1c0-442.3-99.3-552.9-500.9-552.9c-361,0-622.8,54.2-859.7,176c-340.7,176-487.4,478.4-388.1,807.8c58.7,196.3,225.7,365.5,424.2,428.7C6243.6,1192.5,6521.1,1190.2,6719.7,1149.6z M5131.1-159.1c115.1-97,433.3-907.1,433.3-1098.9c-2.2-121.8-74.5-252.7-164.7-297.8c-72.2-33.8-90.3-33.8-160.2-4.5c-81.3,33.8-180.5,164.7-207.6,270.8c-20.3,81.2-36.1,74.5-81.3-38.4c-47.4-112.8-135.4-214.4-214.4-243.7c-81.2-31.6-209.8,36.1-259.5,137.6c-60.9,121.9-49.6,255,51.9,552.8c117.3,352,268.5,665.7,347.5,728.8C4957.3-86.9,5049.9-89.2,5131.1-159.1z M3429.7-1452.1c112.8-65.4,151.2-142.2,173.8-343c11.3-101.6,31.6-227.9,45.1-277.6c13.5-51.9,31.6-198.6,40.6-324.9c13.5-232.4,42.9-313.6,94.8-261.7c13.5,13.5,31.6,94.8,38.3,180.5c11.3,155.7,33.8,198.6,90.3,167c24.8-13.6,33.9-72.2,36.1-223.4c2.3-162.5,11.3-214.4,42.9-246c36.1-36.1,40.6-36.1,79,0c29.3,31.6,38.4,79,38.4,230.2c0,203.1,27.1,252.7,99.3,180.5c27.1-27.1,33.8-74.5,27.1-214.4c-6.8-198.6,29.3-293.3,108.3-293.3c79,0,103.8,63.2,103.8,264c0,158,6.8,189.6,40.6,200.8c70,22.6,133.1-13.6,119.6-67.7c-29.3-119.6-38.4-300.1-15.8-356.6c45.1-119.6,279.8-103.8,309.1,20.3c9,33.8,6.8,130.9-4.5,214.4l-22.6,153.4l72.2,13.5c40.6,6.8,94.8,6.8,121.9-2.3c45.1-13.5,47.4-24.8,31.6-169.2c-6.8-85.7-9-180.5,0-214.4c18-69.9,103.8-108.3,207.6-88c99.3,18,126.4,108.3,97,318.2c-22.6,151.2-11.3,185,63.2,187.3c76.7,0,85.7-22.6,79-187.3c-6.8-191.8,24.8-275.3,108.3-275.3c88,0,117.3,83.5,106.1,300.1c-9,169.2-6.8,187.3,33.8,209.9c24.8,13.5,54.2,15.8,63.2,4.5c11.3-9,22.6-101.5,27.1-203.1c4.5-139.9,18-196.3,47.4-225.7c36.1-36.1,40.6-36.1,79,0c31.6,31.6,38.4,79,38.4,243.7c0,160.2,6.8,207.6,33.8,223.4c60.9,33.8,83.5-6.8,94.8-162.5c9-164.7,42.9-227.9,92.5-180.5c15.8,18.1,29.4,108.3,31.6,236.9c4.5,115.1,22.6,261.8,40.6,327.2c18,67.7,38.4,196.3,47.4,291.1c22.6,255,124.1,370.1,347.5,403.9l101.5,13.5l-56.4-40.6c-31.6-22.6-63.2-51.9-72.2-63.2c-9-13.5-18-162.5-18-331.7c0-230.2-11.3-349.8-45.1-480.6c-47.4-187.3-187.3-478.4-291.1-600.2l-63.2-76.7l-15.8,103.8c-15.8,106.1-56.4,146.7-101.5,101.5c-13.6-13.5-24.8-103.8-24.8-212.1c0-160.2-6.8-189.5-42.9-209.8c-67.7-36.1-70-31.6-70,121.9c0,97-11.3,151.2-33.9,171.5c-97,81.2-173.8-72.2-133.1-270.8c20.3-94.8,18-117.3-13.6-146.7c-81.2-72.2-103.8-45.1-94.8,121.9c9,135.4,2.3,162.5-38.3,203.1c-60.9,60.9-124.1,60.9-185,0c-42.9-42.9-47.4-67.7-40.6-232.4c9-176,6.8-182.8-42.9-189.5c-103.8-15.8-112.8,2.2-76.7,148.9c27.1,115.1,27.1,144.4,0,198.6c-27.1,60.9-40.6,65.4-153.4,65.4c-110.5,0-126.3-6.8-155.7-60.9c-31.6-56.4-31.6-76.7,2.2-203.1c38.4-153.4,31.6-176-72.2-176c-94.8,0-117.3,27.1-90.3,103.8c36.1,90.3,36.1,270.8,0,311.4c-18.1,24.8-65.4,36.1-137.7,36.1c-178.3,0-209.8-94.8-130.9-381.4c11.3-38.3-51.9-56.4-126.4-38.3c-49.6,13.5-51.9,20.3-29.3,97c69.9,255-67.7,462.6-209.9,320.4c-38.4-38.4-45.1-70-40.6-196.3c6.8-160.2-18.1-196.3-97-135.4c-31.6,24.8-33.8,49.6-13.5,164.7c24.8,146.7,0,250.5-60.9,273c-67.7,27.1-101.5-33.8-101.5-185c0-153.5-2.3-158-70-121.9c-36.1,20.3-42.9,49.6-42.9,191.8c0,191.8-13.5,236.9-67.7,236.9c-40.6,0-67.7-58.7-67.7-151.2c0-83.5-29.3-60.9-130.9,94.8c-214.4,322.7-275.3,541.6-275.3,992.9c0,173.8-9,327.2-18,340.7c-9,11.3-40.6,40.6-72.2,63.2l-56.4,40.6l101.5-13.5C3319.1-1407,3393.6-1431.8,3429.7-1452.1z")
 
-var svgHisto = d3.select('.viz').append('svg')
+let svgHisto = d3.select('.viz').append('svg')
     .attr('class', 'center-container')
     .attr('height', height * 0.6 + 4 * margin.top + 4 * margin.bottom)
     .attr('width', width * 0.7 + margin.left + margin.right);
 
-var svgTable = d3.select('.viz').append('svg')
+let svgTable = d3.select('.viz').append('svg')
     .attr('overflow', 'auto')
     .attr('class', 'center-container')
     .attr('height', height * 0.7 + margin.top + 2 * margin.bottom)
@@ -163,13 +163,13 @@ var svgTable = d3.select('.viz').append('svg')
     .attr('width', width * 1.1 + margin.left + margin.right)
     .append("xhtml:body");
 
-var projection = d3.geoAlbersUsa()
+let projection = d3.geoAlbersUsa()
     .translate([width /2 , height / 2])
     .scale(width);
 
-var path = d3.geoPath().projection(projection);
+let path = d3.geoPath().projection(projection);
 
-var g = svgMap.append("g")
+let g = svgMap.append("g")
     .attr('class', 'center-container center-items us-state')
     .attr('transform', 'translate('+margin.left+','+margin.top+')')
     .attr('width', width + margin.left + margin.right)
@@ -312,11 +312,11 @@ function ready(us) {
         })
         .text("Population density");
 
-    var rangeColorToPos = d3.scaleLinear()
+    let rangeColorToPos = d3.scaleLinear()
         .range([0, d3.select("#legendDensity").node().getBBox().width])
         .domain([minPopulation, maxPopulation]);
 
-    var rangeColor = d3.range(minPopulation, maxPopulation, 100000);
+    let rangeColor = d3.range(minPopulation, maxPopulation, 100000);
     g.selectAll('rect')
         .data(rangeColor)
         .enter()
@@ -373,7 +373,7 @@ function clicked(d) {
     active.classed("active", false);
     active = d3.select(this).classed("active", true);
 
-    var bounds = path.bounds(d),
+    let bounds = path.bounds(d),
         dx = bounds[1][0] - bounds[0][0],
         dy = bounds[1][1] - bounds[0][1],
         x = (bounds[0][0] + bounds[1][0]) / 2,
@@ -786,23 +786,23 @@ function showBarChart(stateId) {
 
     let colorScaleChart = d3.scaleLinear().domain([1, d3.max(dataToDisplay,  d => { return d.value; })]).range(['orange', 'red']);
 
-    var barColor = d3.interpolateInferno(0.1);
-    var highlightColor = d3.interpolateInferno(0.3);
+    let barColor = d3.interpolateInferno(0.1);
+    let highlightColor = d3.interpolateInferno(0.3);
 
     let gHisto = svgHisto.append("g")
         .attr("transform", "translate(" + (2.5 * margin.left) + "," + ( 3 * margin.top) + ")");
 
-    var x = d3.scaleBand()
+    let x = d3.scaleBand()
         .range([0, width * 0.7])
         .padding(0.4);
 
-    var y = d3.scaleLinear()
+    let y = d3.scaleLinear()
         .range([height * 0.6, 0])
         .nice()
         .interpolate(d3.interpolateRound);
 
-    var xAxis = d3.axisBottom(x).tickSize([]).tickPadding(10);
-    var yAxis = d3.axisLeft(y).tickSize(1);
+    let xAxis = d3.axisBottom(x).tickSize([]).tickPadding(10);
+    let yAxis = d3.axisLeft(y).tickSize(1);
 
     x.domain(dataToDisplay.map( d => { return d.year; }));
     y.domain([0, d3.max(dataToDisplay,  d => { return d.value; })]);
